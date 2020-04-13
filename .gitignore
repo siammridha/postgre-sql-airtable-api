@@ -1,0 +1,4 @@
+node_modules
+package-lock.json
+sam-template.yaml
+_lambda-layer/*

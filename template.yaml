@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  Modules:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: time-sheet-app-modules
+      Description: Dependencies for slack time sheet app
+      ContentUri: _lambda-layer/
+      CompatibleRuntimes:
+        - nodejs12.x
+      LicenseInfo: 'MIT'
+      RetentionPolicy: Retain
+
+  CreateTable:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: create-table
+      CodeUri: create-table/
+      Handler: index.handler
+      Timeout: 10
+      MemorySize: 512
+      Runtime: nodejs8.10
+      Layers:
+        - !Ref Modules
+      Environment:
+        Variables:
+          NODE_PATH: /opt/node_modules/
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /table/{table_name}
+
+  UpdateTable:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: update-table
+      CodeUri: update-table/
+      Handler: index.handler
+      Timeout: 10
+      MemorySize: 512
+      Runtime: nodejs8.10
+      Layers:
+        - !Ref Modules
+      Environment:
+        Variables:
+          NODE_PATH: /opt/node_modules/
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: PATCH
+            Path: /table
+
+  DeleteTable:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: delete-table
+      CodeUri: delete-table/
+      Handler: index.handler
+      Timeout: 10
+      MemorySize: 512
+      Runtime: nodejs8.10
+      Layers:
+        - !Ref Modules
+      Environment:
+        Variables:
+          NODE_PATH: /opt/node_modules/
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: DELETE
+            Path: /table/{table_id}
